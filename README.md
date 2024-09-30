@@ -169,6 +169,135 @@ http://localhost:8000/redoc
 
 ---
 
+## Пример взаимодействия с приложением
+
+### Получение списка доступных файлов
+
+Если в директории `data` уже есть XML-файлы для обработки, вы можете получить их список с помощью следующего запроса:
+
+```http request
+GET http://0.0.0.0:8000/files
+Accept: application/json
+```
+
+**Пример ответа:**
+
+```json
+{
+  "files": [
+    "test.xml",
+    "elektronika_products_20240924_123058.xml"
+  ]
+}
+```
+
+#### Загрузка нового файла
+
+Чтобы загрузить новый XML-файл для обработки, выполните следующий запрос:
+
+```http request
+POST http://0.0.0.0:8000/upload
+Accept: application/json
+Content-Type: multipart/form-data
+```
+
+**Пример ответа:**
+
+```json
+{
+  "filename": "elektronika_products_20240924_123058.xml"
+}
+```
+
+#### Запуск обработки файла
+
+После того как нужный файл находится в директории `data`, вы можете запустить его обработку:
+
+```http request
+POST http://0.0.0.0:8000/process?filename=elektronika_products_20240924_123058.xml
+Accept: application/json
+```
+
+**Пример ответа:**
+
+```json
+{
+  "message": "Processing started",
+  "job_id": "784e1b32-28af-4f85-89cd-20723765f739"
+}
+```
+
+#### Проверка статуса обработки
+
+Чтобы узнать текущий статус задачи, используйте следующий запрос, подставив ваш `job_id`:
+
+```http request
+GET http://0.0.0.0:8000/progress/{job_id}
+Accept: application/json
+```
+
+**Пример ответа:**
+
+```json
+{
+  "job_id": "2dd7095d-4e40-4b37-9865-59d9da9a2d1f",
+  "processing_progress": 75.12,
+  "update_similar_progress": 0
+}
+```
+
+**Поля ответа:**
+
+- `processing_progress` — процент завершения загрузки данных в ElasticSearch и базу данных.
+- `update_similar_progress` — процент завершения обновления полей `similar_sku`.
+
+#### Получение информации о товаре
+
+После успешной обработки вы можете получить информацию о товаре по его `uuid`:
+
+```http request
+GET http://0.0.0.0:8000/sku/{uuid}
+Accept: application/json
+```
+
+**Пример ответа:**
+
+```json
+{
+  "uuid": "d121f7de-1188-42c1-b8fe-53db4125f894",
+  "product_id": 613876,
+  "title": "Штатив Benro T890+MH2N с головой и держателем для смартфона",
+  "category_lvl_1": "Все товары",
+  "category_lvl_2": "Электроника",
+  "category_lvl_3": "Телефоны",
+  "category_remaining": "Аксессуары для телефонов/Штативы, держатели и стедикамы",
+  "similar_sku": [
+    {
+      "uuid": "0dda7eb9-1819-46c8-909b-b7beb4e5e7f2",
+      "title": "Трипод Benro T560+MH2N, черный"
+    },
+    {
+      "uuid": "2c16f707-a768-49a3-a339-4da8c7429122",
+      "title": "Benro MH2N Складной универсальный держатель для смартфона"
+    },
+    {
+      "uuid": "3c5c505e-175c-47ad-a276-9b8513da293f",
+      "title": "Benro MH2N Складной универсальный держатель для смартфона"
+    },
+    {
+      "uuid": "b4a56f78-0912-4d86-b7b7-71173f0813ed",
+      "title": "Штатив Benro T890+MH2N с головой и держателем для смартфона"
+    },
+    {
+      "uuid": "d121f7de-1188-42c1-b8fe-53db4125f894",
+      "title": "Штатив Benro T890+MH2N с головой и держателем для смартфона"
+    }
+  ]
+}
+```
+
+---
+
 ## Примеры обработки
 ```JSON
 {
